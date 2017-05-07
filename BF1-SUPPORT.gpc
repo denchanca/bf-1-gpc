@@ -1,0 +1,294 @@
+// -----------------------------------------------------------------------------
+//  BLAD LALOO LOVE DICK ALL NIGHT LONG
+// -----------------------------------------------------------------------------
+//	LB + VIEW = Disabled
+//	XBOX + DOWN = Disable Recoil
+// 	XBOX + UP = Disable Rapid Fire
+//	VIEW + UP = More Recoil
+//	VIEW + DOWN = Less Recoil
+//	VIEW + LEFT= Slow Down Rapid Fire
+//	VIEW + RIGHT= Increase Speed of Rapid Fire
+//	LEFT TOP PADDLE = Snipe Shot
+
+// EASY SPRINT
+define 	EASYSPRINT_ENABLED		= TRUE;     // TRUE or FALSE
+
+// AUTO SPOT
+define 	AUTOSPOT_ENABLED		= TRUE;     // TRUE or FALSE
+define 	AUTOSPOT_SCOPEONLY		= TRUE;     // TRUE or FALSE
+define 	AUTOSPOT_TIME 			= 620;      // Cycle time in ms
+
+// HOLD BREATH
+define	HOLD_BREATH				= TRUE;
+
+// AIM ASSIST ABUSE
+define 	AIMASSISTABUSE_ENABLED   = TRUE;     // TRUE or FALSE
+define 	delay       		   	 = 11;
+
+//RAPID FIRE
+int		RAPIDFIRE_ENABLED		= TRUE;
+int 	RATE_OF_FIRE1 			= 9;  // Range: 1 to 25 RPS (Round/s)
+
+// ANTI RECOIL
+define	ANTIRECOIL_ENABLED		= TRUE;    // TRUE or FALSE
+define	ANTIRECOIL_SCOPEONLY	= TRUE;    // TRUE or FALSE
+int	 	ANTIRECOIL_FORCE 		= 23;      // Anti recoil force (vertical): from 0 to 100
+define 	ANTIRECOIL_LEFT			= 0;       // Anti recoil force (left): from 0 to 100
+define	ANTIRECOIL_RIGHT 		= 0;       // Anti recoil force (right): from 0 to 100
+int 	RECOIL_DISABLE			= TRUE;	 // TRUE or FALSE
+
+// VAR
+int 		awesome_activated 		= TRUE;
+int 		anti_recoil, anti_recoil_left, anti_recoil_right;
+int 		hold_time1, rest_time1;
+//Doubletap
+//int 		f_s, f_t;
+
+// INITIALIZATION
+init {
+      hold_time1 = 500 / RATE_OF_FIRE1;
+      rest_time1 = hold_time1 - 20;
+      if(rest_time1 < 0) rest_time1 = 0;
+}
+    
+// WHERE THE MAGIC HAPPENS
+
+main {
+	vm_tctrl(-3);
+		
+// RED WHEN OFF
+ 	if(get_val(XB1_LB) && event_press(XB1_VIEW)) {
+        	awesome_activated = !awesome_activated;
+   	 }
+   	 
+    	if(get_val(XB1_XBOX) && event_press(XB1_DOWN)) {
+        	RECOIL_DISABLE = !RECOIL_DISABLE;
+   	 }
+   	 
+    	if(get_val(XB1_XBOX) && event_press(XB1_UP)) {
+        	RAPIDFIRE_ENABLED = !RAPIDFIRE_ENABLED;
+   	 }
+
+    	if(get_val(XB1_VIEW) && event_press(XB1_DOWN)) {
+            ANTIRECOIL_FORCE = ANTIRECOIL_FORCE - 2;
+  	 }
+
+        if(get_val(XB1_VIEW) && event_press(XB1_UP)) {
+            ANTIRECOIL_FORCE = ANTIRECOIL_FORCE + 2;
+	 }
+
+	 
+    	if(get_val(XB1_VIEW) && event_press(XB1_LEFT)) {
+            RATE_OF_FIRE1 = RATE_OF_FIRE1 - 1;
+  	 }
+
+        if(get_val(XB1_VIEW) && event_press(XB1_RIGHT)) {
+            RATE_OF_FIRE1 = RATE_OF_FIRE1 + 1;
+	 }
+	 
+// GREEN WHEN ON
+  	if(awesome_activated) { 	
+        f_ColorLed(0,0,2,0);
+   	 }
+   	 else if (!awesome_activated){
+   	 	f_ColorLed(0,2,0,0):
+   	 }
+   	 
+ // PINK FOR NO RAPIDFIRE
+  	if(!RAPIDFIRE_ENABLED) { 	
+        f_ColorLed(0,0,0,3);
+   	 }
+   	  	 
+    
+// AUTO SPOT
+        if(AUTOSPOT_ENABLED) {
+            if(!AUTOSPOT_SCOPEONLY || get_val(XB1_LT) && awesome_activated == TRUE) {
+                combo_run(AutoSpot);
+     	}
+     }
+     
+// AUTORUN 
+   		if(get_val(XB1_LY) < -92) { set_val(XB1_LS, 100)}
+   		else if(get_val(XB1_LY) > -92) {set_val(XB1_LS, 0)
+		}
+                
+// HOLD BREATH
+    	if(get_val(XB1_LT) > 10) {combo_run(HBREATH);}
+    	if(get_val(XB1_LT) < 99) {combo_stop(HBREATH);}
+
+// RAPID FIRE    
+   		if(get_val(XB1_RT) && RAPIDFIRE_ENABLED == TRUE){
+   		combo_run(RapidFire)}
+ 		else if (combo_running(RapidFire)){combo_stop(RapidFire);
+     }
+
+// AIM ASSIST TARGETING
+    if(get_val(XB1_LT) && get_ptime(XB1_LT) > 200) {
+            combo_run(TARGET_AIM);
+    }else if(event_release(XB1_LT)) {
+        combo_stop(TARGET_AIM);
+    }
+    if(get_val(XB1_LT) && get_val(XB1_RT)) {
+          combo_run(aim_abuse);
+          combo_run(TARGET_AIM_FIRE);
+      }
+    if(get_val(XB1_LT)) {
+    if(get_val(XB1_RX) < -35) { 
+        combo_run(left_assist);
+        combo_stop(TARGET_AIM);
+        combo_stop(right_assist);
+    }
+    if(get_val(XB1_RX) > 35) {
+        combo_run(right_assist);
+        combo_stop(TARGET_AIM);
+        combo_stop(left_assist);
+    }
+    if(get_val(XB1_LY) < -35 || get_val(XB1_LY) > 35 ||
+       get_val(XB1_LX) < -35 || get_val(XB1_LX) > 35) {
+           combo_stop(TARGET_AIM);
+           combo_stop(left_assist);
+           combo_stop(right_assist);
+       }
+       }
+    
+// Double tap ADS Button to Snipe Mode
+//	if(f_s == 0) {
+//        if(get_val(XB1_PL1) <= 100) f_s = 1;
+//    } else if(f_s == 1) {
+//        if(get_val(XB1_DOWN) >  100) { f_t = 0; f_s = 2; }
+//    } else if(f_s == 2) {
+//        if(get_val(XB1_DOWN) <= 100) { f_s = 1; combo_run(Snipe); }
+//        f_t = f_t + get_rtime();
+//        if(f_t > 100) f_s = 0;
+//    }
+	    
+	if(get_val(XB1_PL1)) {
+ 	combo_run(Snipe);
+ 	}
+ 	
+// ANTI-RECOIL
+    if(!RECOIL_DISABLE) {
+		combo_run(WARN_LIGHT);}
+	else if (combo_running(WARN_LIGHT))combo_stop(WARN_LIGHT);
+	if(ANTIRECOIL_ENABLED && get_val(XB1_RT) && RECOIL_DISABLE == TRUE){
+	if(!ANTIRECOIL_SCOPEONLY || get_val(XB1_LT)){
+	combo_run(AntiRecoil);}
+	else if (combo_running(AntiRecoil))combo_stop(AntiRecoil);
+     }
+}
+
+combo RapidFire {
+    set_val(XB1_RT, 100);
+    wait(hold_time1);
+    set_val(XB1_RT, 0);
+    wait(rest_time1);
+    set_val(XB1_RT, 0);
+    }
+
+combo AutoSpot {
+    wait(11);
+    set_val(XB1_RB, 100);
+    wait(50);
+    set_val(XB1_RB, 0);
+    wait(20);
+}
+
+combo HBREATH {
+    set_val(XB1_LS, 100);
+    wait(100); wait(100);
+}
+
+combo aim_abuse {
+    set_val(XB1_LT, 100);
+    wait(240);
+    set_val(XB1_LT, 0);
+    wait(30);
+    set_val(XB1_LT, 0);
+}
+ 
+combo TARGET_AIM             {
+     set_val         (XB1_RY, -35);
+     set_val         (XB1_LY, -35);
+     wait                 (30);
+     set_val           (XB1_RX, 35);
+     set_val          (XB1_LX, 35);
+     wait                 (30);
+     set_val          (XB1_RY, 35);
+     set_val          (XB1_LY, 35);
+     wait                 (30);
+     set_val          (XB1_RX, -35);
+     set_val         (XB1_LX, -35);
+     wait                 (30);
+ }
+ 
+combo TARGET_AIM_FIRE        {
+     set_val          (XB1_RY, 35);
+     set_val          (XB1_LY, 35);
+     wait                 (50);
+     set_val          (XB1_RX, -35);
+     set_val         (XB1_LX, -35);
+     wait                 (50);
+     set_val         (XB1_RY, -35);
+     set_val         (XB1_LY, -35);
+     wait                 (50);
+     set_val           (XB1_RX, 35);
+     set_val          (XB1_LX, 35);
+     wait                 (50);
+}
+
+combo left_assist {
+    set_val(XB1_LX, -35);
+    wait(400);
+}
+ 
+combo right_assist {
+    set_val(XB1_LX, 35);
+    wait(400);
+}
+ 
+combo aim_strafe {
+    set_val(XB1_LX, -35);
+    wait(400);
+    set_val(XB1_LX, 35);
+    wait(400);
+}
+ 
+
+combo WARN_LIGHT {
+	f_ColorLed(0,2,2,0); // YELLOW;
+}
+
+combo Snipe {
+	set_val(XB1_LT, 100);
+	set_val(XB1_LS, 100);
+	wait(333);
+	set_val(XB1_RT, 100);
+	wait(100);
+	wait(11);
+	set_val(XB1_RT, 0);
+	set_val(XB1_LS, 0);
+	set_val(XB1_LT, 0);
+	wait(20);
+}
+
+combo AntiRecoil {
+    if(get_val(XB1_RT)) {
+        anti_recoil = get_val(10) + ANTIRECOIL_FORCE;
+        if(anti_recoil > 100) anti_recoil = 100;
+        set_val(10, anti_recoil);
+        anti_recoil_left = get_val(9) - ANTIRECOIL_LEFT;
+        if(anti_recoil_left > 100) anti_recoil_left = 100;
+        set_val(9, anti_recoil_left);
+        anti_recoil_right = get_val(9) + ANTIRECOIL_RIGHT;
+        if(anti_recoil_right > 100) anti_recoil_right = 100;
+        set_val(9, anti_recoil_right);}
+    }
+
+// FUNCTIONS
+function f_ColorLed (a,b,c,d){  
+	set_led(LED_1,a);
+	set_led(LED_2,b);
+	set_led(LED_3,c);
+	set_led(LED_4,d);
+	}
+	

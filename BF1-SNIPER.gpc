@@ -1,0 +1,509 @@
+/*
+
+
+
+
+###########################################
+BATTLEFIELD 1 ### SCRIPT MADE BY x22DOT ###
+###########################################
+
+
+
+
+Features:
+
+
+
+
+        - Auto Spot (Only ADS)
+        - Rapid Fire (Always on / only Hipfire / only ADS)
+        - Aim Assist
+        - Shotgun Aim Assist
+        - Recoil Compensation (On the Fly adjustable)
+        - Recoil Compensation (Hipfire)
+        - Auto Sprint (Press Sensitive)
+        - Sniper Mode (Quickscope)
+        - Aim Magnet (BETA / Press Sensitive)
+
+
+
+
+        
+Feature that may be added '12/2016 - 01/2017':
+    
+        - Spread Compensation
+
+
+
+
+
+
+
+
+Information:
+
+
+
+
+        FALSE   =    OFF
+        TRUE    =    ON
+
+
+
+
+        Make sure you have both 'Ingame Aim Assist settings turned ON'!
+
+
+
+
+        - SRINT_SENS        = how much you need to push 'Left Stick' to start running default at '-80'.
+
+
+
+
+        - USE_FIX_FOR_AA    = if Aim Assist is jittery while ADS, turn that ON.
+        - FIX_SENS_FOR_AA   = if you turned on the FIX you need to set a VALUE here from (50 to 90) default at '70'.
+
+
+
+
+        - RECOIL_POWER      = how much the Recoil should be compensated.
+        
+        - RAPID_FIRE_RPS    = Rapid Fire speed in 'Rounds per Second / RPS'.
+
+
+
+
+        - CONTROLLER        = if you use a 'Controller' choose this (Optimized).
+        - MOUSE             = if you use a 'Mouse' choose this (Optimized).
+
+
+
+
+        - PANIC KEY         = toggle all Features at the same time.
+
+
+
+
+        - SHOOTDELAY        = time in 'ms' untill R2/RT is pressed after zooming (SNIPERMODE).
+
+
+
+
+
+
+
+
+Toggles and Buttoncombos:
+
+
+
+
+        L2/LT + DPAD LEFT    = Decrease Recoil Compensation
+        L2/LT + DPAD RIGHT   = Increase Recoil Compensation
+
+
+
+
+        L2/LT + R2/RT + Y/TRIANGLE = Toggle all features
+
+
+
+
+
+
+
+
+##################################################################
+### SPECIAL THANKS TO TWOFAKIND FOR MAKING THIS SCRIPT POSSIBLE ##
+## THANKS FOR TESTING:                                          ##
+# - SCHNOIN                                                     ##
+# - Carl Robo                                                   ##
+# - Le4ker                                                      ##
+#################################################################*/
+
+
+
+
+
+
+
+
+    define CONTROLLER           = FALSE; 
+    define MOUSE                = TRUE;     
+
+
+
+
+    define AUTO_SPOT            = TRUE; 
+
+
+
+
+    define HOLD_BREATH          = TRUE;
+
+
+
+
+    define RAPID_FIRE           = TRUE;
+    define RAPIDFIRE_ONLY_HIP   = TRUE;
+    define RAPIDFIRE_ONLY_ADS   = FALSE;
+    define RAPID_FIRE_RPS       = 11;
+
+
+
+
+    define AIM_ASSIST           = TRUE;
+    define SHOTGUN_AIM_ASSIST   = FALSE; 
+
+
+
+
+    define AUTO_SPRINT          = TRUE;
+    int    SPRINT_SENS          = -80; 
+
+
+
+
+    define USE_FIX_FOR_AA       = FALSE; 
+    define FIX_SENS_FOR_AA      = 70; 
+
+
+
+
+    define RECOIL_CONTROL       = FALSE;
+    define RECOIL_HIPFIRE       = FALSE;
+    int RECOIL_POWER            = 20;
+
+
+
+
+    define SNIPER_MODE          = FALSE;
+    define SHOOTDELAY           = 333;
+
+
+
+
+    define AIM_MAGNET           = TRUE;
+    define AIM_M_PRESS_SENS     = FALSE;
+    int    MAGNET_SENS          = 80;
+
+
+
+
+//################################################################
+//################################################################
+
+
+
+
+    define RT                   = XB1_RT;
+    define LT                   = XB1_LT;
+    define RB                   = XB1_RB;
+    define LB                   = XB1_LB;
+    define RX                   = XB1_RX;                              
+    define RY                   = XB1_RY;
+    define LX                   = XB1_LX;                              
+    define LY                   = XB1_LY;
+    define A                    = XB1_A;
+    define Y                    = XB1_Y;
+    define RS                   = XB1_RS;
+    define LS                   = XB1_LS;
+    define LEFT                 = XB1_LEFT;
+    define RIGHT                = XB1_RIGHT;
+    define UP                   = XB1_UP;
+    define DOWN                 = XB1_DOWN;
+    define delay                = 11;
+    define h                    = 100;
+    define th                   = 200;
+    define n                    = 0;
+    define e                    = 11;
+    define f                    = 50;
+    define z                    = 20;
+    define nz                   = 19;
+    define fz                   = 15;
+    define dz                   = 23;
+    define fn                   = 95;
+    define fh                   = 500;
+
+
+
+
+    int    value;
+    int    value2;
+    int    deadzonemouse;
+    int    deadzonecontroller;
+    int    stop1;
+    int    stop2;
+    int    stop3;
+    int    stop4;
+    int    hold;
+    int    rest;
+    int    panic;    
+
+
+
+
+    init {
+        hold = fh / RAPID_FIRE_RPS;
+        rest = hold - z;
+        if(rest < n) rest = n;
+    }
+
+
+
+
+    main {
+
+
+
+
+        if(CONTROLLER == TRUE && MOUSE == FALSE) {
+            value   = 26;
+            value2  = -26; 
+            stop1   = 24;
+            stop2   = 20;
+            stop3   = 27;
+            stop4   = -22;
+        }
+
+
+
+
+        if(MOUSE == TRUE && CONTROLLER == FALSE) { 
+            value   = 22;
+            value2  = -22;
+            stop1   = 19;
+            stop2   = 15;
+            stop3   = 23;
+            stop4   = -18;
+        }
+
+
+
+
+        if(get_val(LT) && AUTO_SPOT == TRUE) {
+            combo_run(ASPOT_C);
+        }
+
+
+
+
+        if(get_val(LT) && AIM_ASSIST == TRUE && !panic) {
+            combo_run(AA_C);
+        }
+
+
+
+
+        if(!get_val(RT) && SHOTGUN_AIM_ASSIST == TRUE && !panic) {
+            combo_run(AA_C);
+        }
+
+
+
+
+        if(get_val(RT) && get_val(LT)) {
+            combo_stop(AA_C);
+        }
+
+
+
+
+        if(abs(get_val(RX)) >= stop1 || abs(get_val(RY)) >= stop2) {
+            combo_stop(AA_C);
+        }
+
+
+
+
+        if(RECOIL_CONTROL == TRUE && get_val(RT) && get_val(LT) && abs(get_val(RX)) < stop3 && get_val(RY) > stop4 && get_val(RY) < stop3 && !panic) {    
+            combo_run(RC_C);
+        }
+
+
+
+
+        if(RECOIL_HIPFIRE == TRUE && get_val(RT) && abs(get_val(RX)) < stop3 && get_val(RY) > stop4 && get_val(RY) < stop3 && !panic) {    
+            combo_run(RC_C);
+        }
+
+
+
+
+        if(get_val(RT) && get_val(LT) && abs(get_val(RX)) < stop3 && USE_FIX_FOR_AA == TRUE && !panic) {
+            sensitivity(RX, f, FIX_SENS_FOR_AA);         
+        }
+
+
+
+
+        if(get_val(LY) < SPRINT_SENS && AUTO_SPRINT == TRUE && !panic) {
+            combo_run(ASPRINT_C);
+        }
+
+
+
+
+        if(get_val(LT) >= fn && HOLD_BREATH == TRUE && !panic) { 
+            combo_run(HBREATH_C);
+        }
+
+
+
+
+        if(get_val(RT) && RAPID_FIRE == TRUE && !panic) {
+            combo_run(RF_C);
+        }        
+        
+        if(get_val(RT) && get_val(LT) && RAPID_FIRE == TRUE && RAPIDFIRE_ONLY_HIP == TRUE && !panic) {
+            combo_stop(RF_C);
+        }
+
+
+
+
+        if(get_val(RT) && RAPID_FIRE == TRUE && RAPIDFIRE_ONLY_HIP == FALSE && RAPIDFIRE_ONLY_ADS == TRUE && !panic) {
+            combo_stop(RF_C);
+        }
+
+
+
+
+        if(event_press(XB1_LT) && SNIPER_MODE == TRUE && !panic) {
+            combo_run(S_C);
+        }  
+
+
+
+
+        if(get_val(LT) && event_press(LEFT) && !panic) {
+            RECOIL_POWER = RECOIL_POWER - 1;
+        }
+
+
+
+
+        if(get_val(LT) && event_press(RIGHT) && !panic) {
+            RECOIL_POWER = RECOIL_POWER + 1;
+        }
+
+
+
+
+        if(get_val(LT) && get_val(RT) && event_press(Y)) {
+            panic = !panic;
+            combo_run(R_C);
+        }
+
+
+
+
+        if(get_val(LT) && get_ptime(LT) > th && AIM_MAGNET && AIM_M_PRESS_SENS == FALSE && !panic) {
+            combo_run(AM_C);
+        }
+
+
+
+
+        if(get_val(LT) && get_ptime(LT) > th && AIM_MAGNET && AIM_M_PRESS_SENS == TRUE && !panic && get_val(LT) >= MAGNET_SENS) {
+            combo_run(AM_C);
+        }
+
+
+
+
+    }
+
+
+
+
+    combo RC_C {
+        set_val(RY, RECOIL_POWER);
+    }
+
+
+
+
+    combo ASPRINT_C {
+        set_val(LS, h);
+    }
+
+
+
+
+    combo HBREATH_C {
+        set_val(LS, h);
+    }
+
+
+
+
+    combo R_C {
+        set_rumble(RUMBLE_A, 100);
+        set_rumble(RUMBLE_B, 100);
+        wait(500);
+        wait(50);
+        reset_rumble();
+    }
+
+
+
+
+    combo ASPOT_C {
+        wait(e);
+        set_val(RB, h);
+        wait(f);
+        set_val(RB, n);
+        wait(z);
+    }
+
+
+
+
+    combo RF_C {
+        set_val(RT, h);
+        wait(hold);
+        set_val(RT, n);
+        wait(rest);
+        set_val(RT, h);
+    }
+
+
+
+
+   combo AA_C {
+       set_val(RX, value); 
+       wait(delay) 
+       set_val(RX, n); 
+       wait(delay)                  
+       set_val(RX, value2);
+       wait(delay)
+    }
+
+
+
+
+    combo AM_C {
+        set_val(LT, h);
+        wait(40);
+        set_val(LT, n);
+        wait(30);
+        set_val(LT, n);
+    }
+
+
+
+
+    combo S_C {
+        set_val(XB1_LT, 100);
+        set_val(XB1_LS, 100);
+        wait(SHOOTDELAY);
+        set_val(XB1_RT, 100);
+        wait(100);
+        wait(11);
+        set_val(XB1_RT, 0);
+        set_val(XB1_LS, 0);
+        set_val(XB1_LT, 0);
+        wait(20);
+    }
